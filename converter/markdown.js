@@ -35,7 +35,6 @@ var parseStrong = function(str) {
   return str;
 }
 
-
  var parseHorizontaleLine = function(str) {
   var horizontalRegExp = /^(?:([\*\-_] ?)+)\1\1$/gm;
   var stra = [];
@@ -54,16 +53,57 @@ var parseStrong = function(str) {
   return str;
  }
 
+var parseNewLine = function(str) {
+  var newLineRegExp = /(^|[^\n])\n{1}(?!\n)/;
+  var stra = []; var tmp;
+  while ((stra = newLineRegExp.exec(str)) !== null) {
+    tmp = stra[0].replace('\n', '<br/>')
+    str = str.replace(stra[0], tmp);
+  }
+  return str;
+ }
+
+var parseCodeBlock = function(str) {
+  var codeRegExp = /```(.*?)```/;
+  var stra = [];
+  while ((stra = codeRegExp.exec(str)) !== null) {
+    str = str.replace(stra[0], '<code>' + stra[1] + '</code>');
+  }
+  return str;
+ }
+
+ var parseBlockQuote = function(str) {
+  var quoteRegExp = /\:\"(.*?)\"\:/
+  var stra = [];
+  while ((stra = quoteRegExp.exec(str)) !== null) {
+    str = str.replace(stra[0], '<blockquote>' + stra[1] + '</blockquote>');
+  }
+  return str;
+ }
+
+ var parseDel = function(str) {
+  var delRegExp = /\{(.*?)\}/
+  var stra = [];
+  while ((stra = delRegExp.exec(str)) !== null) {
+    str = str.replace(stra[0], '<del>' + stra[1] + '</del>');
+  }
+  return str;
+ }
 
 var markdown = {
   parse: function (str, strict) {
     'use strict';
+    str = parseNewLine(str);
     str = parseHeadline(str);
     str = parseBold(str);
     str = parseItalic(str);
     str = parseStrong(str);
     str = parseHorizontaleLine(str);
     str = parseLink(str);
+    str = parseBlockQuote(str);
+    str = parseDel(str);
+    str = parseCodeBlock(str);
+    str = parseHorizontaleLine(str);
     return str;
   }
 };
